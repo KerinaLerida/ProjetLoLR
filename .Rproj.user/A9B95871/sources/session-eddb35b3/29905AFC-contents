@@ -1,0 +1,38 @@
+# Charger les bibliothèques
+library(shiny)
+library(plotly)
+
+# Créer le jeu de données (exemple avec des données aléatoires)
+df <- data.frame(
+  Country = c('USA', 'Canada', 'Mexico', 'France', 'Germany', 'Spain'),
+  Value = c(10, 15, 7, 20, 25, 12)
+)
+
+# Définir l'interface utilisateur Shiny
+ui <- fluidPage(
+  titlePanel("Dashboard avec carte choroplèthe"),
+  
+  # Ajouter la carte choroplèthe
+  plotlyOutput("choropleth-map")
+)
+
+# Définir le serveur Shiny
+server <- function(input, output) {
+  # Créer la carte choroplèthe
+  output$choropleth-map <- renderPlotly({
+    plot_ly(
+      data = df,
+      type = 'choropleth',
+      locations = ~Country,
+      locationmode = 'country names',
+      z = ~Value,
+      colors = 'Plasma',
+      text = ~paste('Country: ', Country, '<br>Value: ', Value)
+    ) %>%
+      layout(title = 'Exemple de Carte Choroplèthe')
+  })
+}
+
+# Lancer l'application Shiny
+shinyApp(ui = ui, server = server)
+

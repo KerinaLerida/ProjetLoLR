@@ -1,0 +1,27 @@
+{
+    "id": "60F7725E",
+    "path": "~/DSIA4101/DSIA_4101C/mon-dashboard/install.R",
+    "project_path": "install.R",
+    "type": "r_source",
+    "hash": "203150700",
+    "contents": "",
+    "dirty": false,
+    "created": 1699790551275.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "19,20",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1699800316,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1699800316531,
+    "read_only": false,
+    "read_only_alternatives": []
+}

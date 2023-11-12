@@ -1,0 +1,74 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+# Charger les packages nécessaires
+library(shiny)
+library(dplyr)
+library(plotly)
+
+# Charger le script prepa.R (assurez-vous que le chemin d'accès est correct)
+prepa <- source("prepa.R")
+
+# Accéder aux objets créés dans le script
+pays_infos <- prepa$value$pays_infos
+servers_countries <- prepa$value$servers_countries
+
+# Définir l'UI
+ui <- fluidPage(
+  titlePanel("League of Legends Choropleth Map"),
+  mainPanel(
+    plotlyOutput("choroplethMap")
+  )
+)
+
+# Définir la logique du serveur
+server <- function(input, output) {
+  output$choroplethMap <- renderPlotly({
+    # Données fictives pour le moment
+    df_map <- data.frame(
+      region = c("EUW", "NA", "KR", "BR"),
+      value = c(50, 55, 60, 45)
+    )
+    
+    df_map <- df_map %>%
+      mutate(country = recode(region, !!!setNames(names(servers_countries), names(servers_countries))))
+    regi
+    # Création de la carte choropleth
+    fig <- plot_ly(
+      df_map,
+      type = 'choropleth',
+      locations = ~country,
+      locationmode = 'country names',
+      z = ~value,
+      colorscale = 'Plasma',
+      range = c(min(df_map$value), max(df_map$value)),
+      colorbar = list(title = 'Winrate (%)')
+    )
+    
+    # Configuration de l'apparence de la carte
+    fig <- fig %>%
+      layout(
+        geo = list(
+          showland = TRUE,
+          showcoastlines = TRUE,
+          landcolor = 'rgb(217, 217, 217)',
+          center = list(lon = -0, lat = 0),
+          projection_scale = 1
+        ),
+        height = 500
+      )
+    
+    return(fig)
+  })
+}
+
+# Lancer l'application Shiny
+shinyApp(ui = ui, server = server)
+
+
+

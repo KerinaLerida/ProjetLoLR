@@ -1,0 +1,26 @@
+{
+    "id": "9E5754CA",
+    "path": "~/DSIA4101/DSIA_4101C/mon-dashboard/prepa.R",
+    "project_path": "prepa.R",
+    "type": "r_source",
+    "hash": "237197491",
+    "contents": "",
+    "dirty": false,
+    "created": 1699717510370.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "22,68",
+        "scrollLine": "15"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1699804381,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1699804381067,
+    "read_only": false,
+    "read_only_alternatives": []
+}

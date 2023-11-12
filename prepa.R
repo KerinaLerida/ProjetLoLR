@@ -1,0 +1,157 @@
+library(dplyr)
+
+# CSV : de tous les pays du monde
+countries_df <- read.csv('data/curiexplore-pays.csv', sep=';', encoding='utf-8', stringsAsFactors=FALSE)
+
+# EXCEPTION
+servers_bonus <- list(
+  EUNE = list(
+    name = 'Europe Nordic & East',
+    countries = c("Norway", "Sweden", "Finland", "Estonia", "Latvia", "Lithuania", "Belarus", "Ukraine", "Crimea", "Moldova", "Romania", "Bulgaria", "Greece", "Albania", "Macedonia", "Kosovo", "Montenegro", "Serbia", "Bosnia and Herzegovina", "Croatia", "Hungary", "Slovakia", "Slovenia", "Czech Republic" , "Poland"),
+    relation = NULL
+  ),
+  LAN = list(
+    name = 'Latin America North',
+    countries = c("Venezuela", "Colombia", "Ecuador", "Peru"),
+    relation = "central_america_caraibes"
+  ),
+  LAS = list(
+    name = 'Latin America South',
+    countries = c("Bolivia", "Paraguay", "Argentina", "Uruguay", "Chile"),
+    relation = NULL
+  ),
+  'NA' = list( # Exception Problème de NA détecté comme valeur nulle
+    name = 'North America',
+    countries = c('Canada', 'United States of America', 'Bermuda', 'Quebec'), 
+    relation = NULL
+  ),
+  OCE = list(
+    name = 'Oceania',
+    countries = c("Australia", "New Zealand"),
+    relation = NULL
+  ),
+  LAT = list(
+    name = 'Latin America',
+    countries = c("Bolivia", "Paraguay", "Argentina", "Uruguay", "Chile", "Venezuela", "Colombia", "Ecuador", "Peru"),
+    relation = NULL
+  ),
+  SEA = list(
+    name = 'Asia East South',
+    countries = c("Singapore", "Malaysia", "Indonesia", "Philippines", "Thailand", "Indonesia", "Taiwan"),
+    relation = NULL
+  ),
+  EUW = list(
+    name = 'Europe West',
+    countries = c("France", "United Kingdom of Great Britain and Northern Ireland", "Ireland", "Spain", "Portugal", "Monaco", "Andorra", "Belgium", "Luxembourg", "Netherlands", "Switzerland", "Italy", "Saint Martin", "Vatican", "Malta", "Austria", "Germany"),
+    relation = NULL
+  ),
+  JPN = list(
+    name = 'Japan',
+    countries = c("Japan"),
+    relation = NULL
+  ),
+  BRA = list(
+    name = 'Brazil',
+    countries = c("Brazil"),
+    relation = NULL
+  )
+)
+
+# Dictionnaire : pour le CSV des pays
+pays_infos <- list()
+
+# Parcours chaque ligne du DataFrame et construire le dictionnaire
+for (i in 1:nrow(countries_df)) {
+  name_en <- countries_df$name_en[i]
+  iso2 <- countries_df$iso2[i]
+  latlng <- countries_df$latlng[i]
+  central_america_caraibes <- countries_df$central_america_caraibes[i]
+  north_america <- countries_df$north_america[i]
+  
+  latlng_parts <- strsplit(latlng, ',')[[1]]
+  if (length(latlng_parts) == 2) {
+    latitude <- as.numeric(trimws(latlng_parts[1]))
+    longitude <- as.numeric(trimws(latlng_parts[2]))
+  } else {
+    latitude <- NULL
+    longitude <- NULL
+  }
+  
+  # Ajout dans le dictionnaire
+  pays_infos[[name_en]] <- list(
+    iso2 = iso2,
+    latitude = latitude,
+    longitude = longitude,
+    central_america_caraibes = central_america_caraibes,
+    north_america = north_america
+  )
+}
+
+# Pour ajouter les pays, à un serveur
+for (abrev in names(servers_bonus)) {
+  server_info <- servers_bonus[[abrev]]
+  
+  if (!is.null(server_info$relation)) {
+    relation <- server_info$relation
+    
+    for (country_name in names(pays_infos)) {
+      country_info <- pays_infos[[country_name]]
+      
+      if (relation %in% names(country_info) && as.logical(country_info[[relation]])) {
+        if (is.null(server_info$countries)) {
+          server_info$countries <- character(0)
+        }
+        server_info$countries <- c(server_info$countries, country_name)
+      }
+    }
+  }
+}
+
+# Dictionnaire final : regroupant les pays et les serveurs selon leur abrev/iso
+servers_countries <- list()
+
+for (abrev in names(servers_bonus)) {
+  server_info <- servers_bonus[[abrev]]
+  
+  server_data <- list(
+    name = server_info$name,
+    countries = server_info$countries,
+    latitude = NULL,
+    longitude = NULL,
+    coord = list(NULL, NULL)
+  )
+  if (length(server_info$countries) > 0) {
+    coordinates <- lapply(server_info$countries, function(country_name) {
+      if (country_name %in% names(pays_infos)) {
+        c(pays_infos[[country_name]]$longitude, pays_infos[[country_name]]$latitude)
+      } else {
+        NULL
+      }
+    })
+    if (any(!sapply(coordinates, is.null))) {
+      server_data$coord <- coordinates
+    } else {
+      server_data$coord <- list(NULL, NULL)
+    }
+  }
+  servers_countries[[abrev]] <- server_data # Ajout à servers_countries avec abrev
+}
+
+for (country_name in names(pays_infos)) {
+  country_info <- pays_infos[[country_name]]
+  
+  country_data <- list(
+    name = country_name,
+    countries = list(country_name),
+    latitude = ifelse(!is.null(country_info$latitude), country_info$latitude, NULL),
+    longitude = ifelse(!is.null(country_info$longitude), country_info$longitude, NULL),
+    coord = list(list(ifelse(!is.null(country_info$longitude), country_info$longitude, NULL), 
+                      ifelse(!is.null(country_info$latitude), country_info$latitude, NULL)))
+  )
+  servers_countries[[country_info$iso2]] <- country_data # Ajout à servers_countries avec iso2
+}
+
+#print(servers_countries[["NA"]])
+
+return (servers_countries)
+

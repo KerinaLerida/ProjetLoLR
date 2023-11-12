@@ -1,0 +1,6 @@
+shiny
+dplyr
+ggplot2
+plotly
+readr
+shinyjs

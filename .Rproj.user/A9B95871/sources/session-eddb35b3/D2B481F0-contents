@@ -1,0 +1,103 @@
+# Charger le package nécessaire
+library(dplyr)
+
+# Charger le fichier CSV des pays
+countries_df <- read.csv('data-files/curiexplore-pays.csv', sep=';', encoding='utf-8', stringsAsFactors=FALSE)
+
+# Créer le dictionnaire pays_infos
+pays_infos <- list()
+
+# Parcourir chaque ligne du DataFrame et construire le dictionnaire
+for (i in 1:nrow(countries_df)) {
+  name_en <- countries_df$name_en[i]
+  iso2 <- countries_df$iso2[i]
+  latlng <- countries_df$latlng[i]
+  central_america_caraibes <- countries_df$central_america_caraibes[i]
+  north_america <- countries_df$north_america[i]
+  idh_group <- countries_df$idh_group[i]
+  
+  # Diviser latlng en latitude et longitude
+  latlng_parts <- strsplit(latlng, ',')[[1]]
+  if (length(latlng_parts) == 2) {
+    latitude <- as.numeric(trimws(latlng_parts[1]))
+    longitude <- as.numeric(trimws(latlng_parts[2]))
+  } else {
+    latitude <- NULL
+    longitude <- NULL
+  }
+  
+  pays_infos[[name_en]] <- list(
+    iso2 = iso2,
+    latitude = latitude,
+    longitude = longitude,
+    central_america_caraibes = central_america_caraibes,
+    north_america = north_america,
+    idh_group = idh_group
+  )
+}
+
+# Créer le dictionnaire servers_bonus
+servers_bonus <- list(
+  EUNE = list(
+    name = 'Europe Nordic & East',
+    countries = c("Norway", "Sweden", "Finland", "Estonia", "Latvia", "Lithuania", "Belarus", "Ukraine", "Crimea", "Moldova", "Romania", "Bulgaria", "Greece", "Albania", "Macedonia", "Kosovo", "Montenegro", "Serbia", "Bosnia and Herzegovina", "Croatia", "Hungary", "Slovakia", "Slovenia", "Czech Republic" , "Poland"),
+    relation = NULL
+  ),
+  LAN = list(
+    name = 'Latin America North',
+    countries = c("Venezuela", "Colombia", "Ecuador", "Peru"),
+    relation = "central_america_caraibes"
+  ),
+  LAS = list(
+    name = 'Latin America South',
+    countries = c("Bolivia", "Paraguay", "Argentina", "Uruguay", "Chile"),
+    relation = NULL
+  ),
+  'NA' = list(
+    name = 'North America',
+    countries = NULL,
+    relation = "north_america"
+  ),
+  OCE = list(
+    name = 'Oceania',
+    countries = c("Australia", "New Zealand"),
+    relation = NULL
+  ),
+  LAT = list(
+    name = 'Latin America',
+    countries = c("Bolivia", "Paraguay", "Argentina", "Uruguay", "Chile", "Venezuela", "Colombia", "Ecuador", "Peru"),
+    relation = NULL
+  ),
+  SEA = list(
+    name = 'Asia East South',
+    countries = c("Singapore", "Malaysia", "Indonesia", "Philippines", "Thailand", "Indonesia", "Taiwan"),
+    relation = NULL
+  ),
+  EUW = list(
+    name = 'Europe West',
+    countries = c("France", "United Kingdom of Great Britain and Northern Ireland", "Ireland", "Spain", "Portugal", "Monaco", "Andorra", "Belgium", "Luxembourg", "Netherlands", "Switzerland", "Italy", "Saint Martin", "Vatican", "Malta", "Austria", "Germany"),
+    relation = NULL
+  ),
+  JPN = list(
+    name = 'Japan',
+    countries = c("Japan"),
+    relation = NULL
+  ),
+  BRA = list(
+    name = 'Brazil',
+    countries = c("Brazil"),
+    relation = NULL
+  )
+)
+
+# Créer un dictionnaire pays_infos
+pays_infos <- list()
+
+# Parcourir chaque ligne du DataFrame et construire le dictionnaire
+for (i in 1:nrow(countries_df)) {
+  name_en <- countries_df$name_en[i]
+  iso2 <- countries_df$iso2[i]
+  latlng <- countries_df$latlng[i]
+  central_america_caraibes <- countries_df$central_america_caraibes[i]
+  north_america <- countries_df$north
+}
